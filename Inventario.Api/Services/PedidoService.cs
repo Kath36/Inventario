@@ -27,9 +27,9 @@ namespace Inventario.Api.Services
                 Cliente = pedidoDto.Cliente,
                 Fecha_Pedido = pedidoDto.Fecha_Pedido,
                 Estado = pedidoDto.Estado,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
             pedido = await _pedidoRepository.SaveAsync(pedido);

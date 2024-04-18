@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Inventario.Core.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using Inventario.Core.Http;
 using Inventario.Api.Dto;
-using Inventario.Api.Repositories.Interfecies;
 using Inventario.Services.Interfaces;
 
 namespace Inventario.Api.Controllers

@@ -27,9 +27,9 @@ public class ProductCategoryServices : IProductCategoryService
         {
             Name = categoryDto.Name,
             Description = categoryDto.Description,
-            CreatedBy = "",
+            CreatedBy = "Kath",
             CreatedDate = DateTime.Now,
-            UpdatedBy = "",
+            UpdatedBy = "Kath",
             UpdatedDate = DateTime.Now
         };
         catetegory = await _productCategoryRepository.SaveAsycn(catetegory);

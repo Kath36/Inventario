@@ -22,3 +22,15 @@ C:\Users\VAIO\Desktop\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Cor
 C:\Users\VAIO\Desktop\Inventario\Inventario.Core\obj\Debug\net7.0\refint\Inventario.Core.dll
 C:\Users\VAIO\Desktop\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.pdb
 C:\Users\VAIO\Desktop\Inventario\Inventario.Core\obj\Debug\net7.0\ref\Inventario.Core.dll
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\bin\Debug\net7.0\Inventario.Core.deps.json
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\bin\Debug\net7.0\Inventario.Core.dll
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\bin\Debug\net7.0\Inventario.Core.pdb
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.csproj.AssemblyReference.cache
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.AssemblyInfoInputs.cache
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.AssemblyInfo.cs
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.csproj.CoreCompileInputs.cache
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.dll
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\refint\Inventario.Core.dll
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\Inventario.Core.pdb
+C:\Users\VAIO\Desktop\Proyecto Inventario\Inventario\Inventario.Core\obj\Debug\net7.0\ref\Inventario.Core.dll

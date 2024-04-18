@@ -2,10 +2,6 @@
 using Inventario.Api.Dto;
 using Inventario.Api.Repositories.Interfecies;
 using Inventario.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Inventario.Api.Services
 {
@@ -31,9 +27,9 @@ namespace Inventario.Api.Services
                 Material_ID = registroMaterialDto.MaterialId,
                 Cantidad = registroMaterialDto.Cantidad,
                 Fecha_Registro = registroMaterialDto.FechaRegistro,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
             registroMaterial = await _registroMaterialRepository.SaveAsync(registroMaterial);

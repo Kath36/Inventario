@@ -26,14 +26,37 @@ namespace Inventario.Api.Services
 
         public async Task<DetallePedidoDto> SaveAsync(DetallePedidoDto detallePedidoDto)
         {
+            // Validar que los campos no sean nulos o vacíos
+            if (detallePedidoDto == null)
+            {
+                throw new ArgumentNullException(nameof(detallePedidoDto), "Los datos del detalle de pedido no pueden ser nulos.");
+            }
+
+            if (detallePedidoDto.Pedido_ID <= 0)
+            {
+                throw new ArgumentException("El Pedido_ID debe ser mayor que cero.");
+            }
+
+            if (detallePedidoDto.Material_ID <= 0)
+            {
+                throw new ArgumentException("El Material_ID debe ser mayor que cero.");
+            }
+
+            if (detallePedidoDto.Cantidad <= 0)
+            {
+                throw new ArgumentException("La Cantidad debe ser mayor que cero.");
+            }
+
+            // Resto del código para guardar el detalle del pedido en la base de datos...
+        
             var detallePedido = new DetallePedido
             {
                 Pedido_ID = detallePedidoDto.Pedido_ID,
                 Material_ID = detallePedidoDto.Material_ID,
                 Cantidad = detallePedidoDto.Cantidad,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
             detallePedido = await _detallePedidoRepository.SaveAsync(detallePedido);
@@ -47,6 +70,21 @@ namespace Inventario.Api.Services
 
             if (detallePedido == null)
                 throw new Exception("DetallePedido not found");
+
+            if (detallePedidoDto.Pedido_ID <= 0)
+            {
+                throw new ArgumentException("El Pedido_ID debe ser mayor que cero.");
+            }
+
+            if (detallePedidoDto.Material_ID <= 0)
+            {
+                throw new ArgumentException("El Material_ID debe ser mayor que cero.");
+            }
+
+            if (detallePedidoDto.Cantidad <= 0)
+            {
+                throw new ArgumentException("La Cantidad debe ser mayor que cero.");
+            }
 
             detallePedido.Pedido_ID = detallePedidoDto.Pedido_ID;
             detallePedido.Material_ID = detallePedidoDto.Material_ID;
@@ -73,14 +111,24 @@ namespace Inventario.Api.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            // Validar si el detalle de pedido existe antes de eliminarlo
+            var detallePedidoExistente = await _detallePedidoRepository.GetById(id);
+            if (detallePedidoExistente == null)
+            {
+                throw new ArgumentException($"No se encontró ningún detalle de pedido con el id {id}.");
+            }
+
             return await _detallePedidoRepository.DeleteAsync(id);
         }
 
         public async Task<DetallePedidoDto> GetById(int id)
         {
+            // Validar si el detalle de pedido existe antes de obtenerlo
             var detallePedido = await _detallePedidoRepository.GetById(id);
             if (detallePedido == null)
-                throw new Exception("DetallePedido not found");
+            {
+                throw new ArgumentException($"No se encontró ningún detalle de pedido con el id {id}.");
+            }
             
             var detallePedidoDto = new DetallePedidoDto
             {

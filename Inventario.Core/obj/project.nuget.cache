@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "S+O9mnUub/WEuojXhE3hwJCFcjnKMA4YxijuLARNlu7lkbssD5uXY2aDPUtEOGFop9PaZ1zUUkJM/mSpxJeYzg==",
+  "dgSpecHash": "XmtBo8c6nRAQLsfov3rzXjYj1BoYJN48635SeAESg8kMWasihLfYh9cmi4GZ+UBfZXHC4HuWQEuL7NBxAi15DA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
+  "projectFilePath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\VAIO\\.nuget\\packages\\dapper\\2.1.37\\dapper.2.1.37.nupkg.sha512",
     "C:\\Users\\VAIO\\.nuget\\packages\\dapper.contrib\\2.0.78\\dapper.contrib.2.0.78.nupkg.sha512",

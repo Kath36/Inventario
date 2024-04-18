@@ -32,9 +32,9 @@ namespace Inventario.Api.Services
                 Descripcion = materialDto.Descripcion,
                 Precio = materialDto.Precio,
                 Unidad = materialDto.Unidad,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
 
@@ -54,7 +54,7 @@ namespace Inventario.Api.Services
             material.Descripcion = materialDto.Descripcion;
             material.Precio = materialDto.Precio;
             material.Unidad = materialDto.Unidad;
-            material.UpdatedBy = "";
+            material.UpdatedBy = "Kath";
             material.UpdatedDate = DateTime.Now;
 
             await _materialRepository.UpdateAsync(material);

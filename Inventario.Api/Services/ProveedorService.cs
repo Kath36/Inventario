@@ -31,9 +31,9 @@ namespace Inventario.Api.Services
                 Nombre = proveedorDto.Nombre,
                 Direccion = proveedorDto.Direccion,
                 Telefono = proveedorDto.Telefono,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
             proveedor = await _proveedorRepository.SaveAsync(proveedor);

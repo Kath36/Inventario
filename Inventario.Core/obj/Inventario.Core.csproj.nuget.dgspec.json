@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\Inventario.Core.csproj": {}
+    "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\Inventario.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\Inventario.Core.csproj": {
+    "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\Inventario.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
+        "projectUniqueName": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
         "projectName": "Inventario.Core",
-        "projectPath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
+        "projectPath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\Inventario.Core.csproj",
         "packagesPath": "C:\\Users\\VAIO\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Core\\obj\\",
+        "outputPath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\VAIO\\AppData\\Roaming\\NuGet\\NuGet.Config"

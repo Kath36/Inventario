@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "khY/f4jsnrZKIu7ozIA3fi4JWsm8nqkdc2Xb9YMUXx5lPNzvkIaw6If9Tg/M34j7uudnKeOEZaPXprjoHCHzsg==",
+  "dgSpecHash": "bhHlM292E3f2hp6YExGeu0/IN8lsUaSwL6SdU9SQDcyhZqGTyfiKmljnlKwVk6YrSKnEEDHA5kTbZkkuTEaLrA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
+  "projectFilePath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\VAIO\\.nuget\\packages\\coverlet.collector\\3.2.0\\coverlet.collector.3.2.0.nupkg.sha512",
     "C:\\Users\\VAIO\\.nuget\\packages\\dapper\\2.1.37\\dapper.2.1.37.nupkg.sha512",

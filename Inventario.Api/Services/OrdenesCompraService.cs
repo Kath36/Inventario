@@ -32,9 +32,9 @@ namespace Inventario.Api.Services
                 Cantidad = ordenCompraDto.Cantidad,
                 Proveedor_ID = ordenCompraDto.ProveedorId,
                 Fecha_Orden = ordenCompraDto.FechaOrden,
-                CreatedBy = "",
+                CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
-                UpdatedBy = "",
+                UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
             ordenCompra = await _ordenCompraRepository.SaveAsync(ordenCompra);

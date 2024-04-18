@@ -2,6 +2,7 @@ using Dapper.Contrib.Extensions;
 using Inventario.Api.DataAccess;
 using Inventario.Api.DataAccess.Interfaces;
 using Inventario.Api.Repositories;
+using Inventario.Api.Repositories.Interfaces;
 using Inventario.Api.Repositories.Interfecies;
 using Inventario.Api.Services;
 using Inventario.Services.Interfaces;
@@ -26,6 +27,9 @@ builder.Services.AddScoped<IDetallePedidoRepository, DetallePedidoRepository>();
 builder.Services.AddScoped<IDetallePedidoService, DetallePedidoService>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
 
 
 builder.Services.AddScoped<IDbContext, DbContext>();

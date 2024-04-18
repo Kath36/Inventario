@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj": {}
+    "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj": {
+    "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
         "projectName": "Inventario.Tests",
-        "projectPath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
+        "projectPath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\Inventario.Tests.csproj",
         "packagesPath": "C:\\Users\\VAIO\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\VAIO\\Desktop\\Inventario\\Inventario.Tests\\obj\\",
+        "outputPath": "C:\\Users\\VAIO\\Desktop\\Proyecto Inventario\\Inventario\\Inventario.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\VAIO\\AppData\\Roaming\\NuGet\\NuGet.Config"

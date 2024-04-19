@@ -16,7 +16,16 @@ namespace Inventario.Api.Services
         {
             _usuarioRepository = usuarioRepository;
         }
+        public async Task<UsuarioDto> AuthenticateAsync(string email, string contraseña)
+        {
+            var usuario = await _usuarioRepository.GetByEmailAsync(email);
+            // Verificar si el usuario existe y si la contraseña es correcta
+            if (usuario == null || usuario.Contraseña != contraseña)
+                return null;
 
+            // Autenticación exitosa, devolver el usuario DTO
+            return new UsuarioDto(usuario);
+        }
         public async Task<bool> UsuarioExists(int id)
         {
             return await _usuarioRepository.UsuarioExistsByIdAsync(id);

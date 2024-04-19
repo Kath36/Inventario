@@ -17,27 +17,47 @@ namespace Inventario.Api.Controllers
             _pedidoService = pedidoService;
         }
 
+   
         [HttpGet]
         public async Task<ActionResult<Response<List<PedidoDto>>>> GetAll()
         {
-            var response = new Response<List<PedidoDto>>
+            try
             {
-                Data = await _pedidoService.GetAllAsync()
-            };
-            return Ok(response);
+                var response = new Response<List<PedidoDto>>
+                {
+                    Data = await _pedidoService.GetAllAsync()
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "No hay datos"  });
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<Response<PedidoDto>>> Post([FromBody] PedidoDto pedidoDto)
         {
-            var response = new Response<PedidoDto>()
+            try
             {
-                Data = await _pedidoService.SaveAsync(pedidoDto)
-            };
-            return Created($"/api/[controller]/{response.Data.id}", response);
-        }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-        [HttpGet]
+                var response = new Response<PedidoDto>()
+                {
+                    Data = await _pedidoService.SaveAsync(pedidoDto)
+                };
+                return Created($"/api/[controller]/{response.Data.id}", response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Verifica que hayas llenado correctamente los campos " });
+            }
+            }
+
+            [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<PedidoDto>>> GetById(int id)
         {
@@ -45,7 +65,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.PedidoExists(id))
             {
-                response.Errors.Add("Pedido not found");
+                return StatusCode(500, new { message = "El ID ingresado no existe" });
                 return NotFound(response);
             }
 
@@ -60,7 +80,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.PedidoExists(pedidoDto.id))
             {
-                response.Errors.Add("Pedido not found");
+                return StatusCode(500, new { message = "El ID ingresado no existe" });
                 return NotFound(response);
             }
 
@@ -76,7 +96,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.DeleteAsync(id))
             {
-                response.Errors.Add("Pedido not found");
+                return StatusCode(500, new { message = "El ID ingresado no existe" });
                 return NotFound(response);
             }
 

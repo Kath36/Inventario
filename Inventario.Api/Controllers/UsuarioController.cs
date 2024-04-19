@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Inventario.Api.Dto;
 using Inventario.Services.Interfaces;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Inventario.Core.Http;
 
@@ -10,13 +9,23 @@ namespace Inventario.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsuariosController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
 
-        public UsuariosController(IUsuarioService usuarioService)
+        public AuthController(IUsuarioService usuarioService)
         {
             _usuarioService = usuarioService;
+        }
+
+        [HttpPost("authenticate")]
+        public async Task<ActionResult<UsuarioDto>> Authenticate([FromBody] LoginRequestDto loginRequest)
+        {
+            var usuario = await _usuarioService.AuthenticateAsync(loginRequest.Email, loginRequest.Contraseña);
+            if (usuario == null)
+                return BadRequest(new { message = "Correo electrónico o contraseña incorrectos" });
+
+            return Ok(usuario);
         }
 
         [HttpGet]

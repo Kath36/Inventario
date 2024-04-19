@@ -68,6 +68,7 @@ namespace Inventario.Api.Services
 
         public async Task<RegistroMaterialDto> GetByIdAsync(int id)
         {
+            
             var registroMaterial = await _registroMaterialRepository.GetById(id);
             if (registroMaterial == null)
                 throw new Exception("Registro Material not found");

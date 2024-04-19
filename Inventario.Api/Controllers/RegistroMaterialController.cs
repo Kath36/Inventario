@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Inventario.Core.Entities;
@@ -23,21 +24,40 @@ namespace Inventario.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Response<List<RegistroMaterialDto>>>> GetAll()
         {
-            var response = new Response<List<RegistroMaterialDto>>
+            var response = new Response<List<RegistroMaterialDto>>();
+
+            try
             {
-                Data = await _registroMaterialService.GetAllAsync()
-            };
-            return Ok(response);
+                response.Data = await _registroMaterialService.GetAllAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("Error al obtener los registros de material: ");
+                return StatusCode(500, response);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<Response<RegistroMaterialDto>>> Post([FromBody] RegistroMaterialDto registroMaterialDto)
         {
-            var response = new Response<RegistroMaterialDto>()
+            if (!ModelState.IsValid)
             {
-                Data = await _registroMaterialService.SaveAsync(registroMaterialDto)
-            };
-            return Created($"/api/[controller]/{response.Data.id}", response);
+                return BadRequest(ModelState);
+            }
+
+            var response = new Response<RegistroMaterialDto>();
+
+            try
+            {
+                response.Data = await _registroMaterialService.SaveAsync(registroMaterialDto);
+                return Created($"/api/[controller]/{response.Data.id}", response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("Error al guardar el registro de material: " + ex.Message);
+                return StatusCode(500, response);
+            }
         }
 
         [HttpGet]
@@ -48,27 +68,48 @@ namespace Inventario.Api.Controllers
 
             if (!await _registroMaterialService.RegistroMaterialExists(id))
             {
-                response.Errors.Add("Registro Material not found");
+                response.Errors.Add("Registro de material no encontrado");
                 return NotFound(response);
             }
 
-            response.Data = await _registroMaterialService.GetByIdAsync(id);
-            return Ok(response);
+            try
+            {
+                response.Data = await _registroMaterialService.GetByIdAsync(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("El ID ");
+                return StatusCode(500, response);
+            }
         }
 
         [HttpPut]
         public async Task<ActionResult<Response<RegistroMaterialDto>>> Update([FromBody] RegistroMaterialDto registroMaterialDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var response = new Response<RegistroMaterialDto>();
 
             if (!await _registroMaterialService.RegistroMaterialExists(registroMaterialDto.id))
             {
-                response.Errors.Add("Registro Material not found");
+                response.Errors.Add("Registro de material no encontrado");
                 return NotFound(response);
             }
 
-            response.Data = await _registroMaterialService.UpdateAsync(registroMaterialDto);
-            return Ok(response);
+            try
+            {
+                response.Data = await _registroMaterialService.UpdateAsync(registroMaterialDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("Error al actualizar el registro de material: ");
+                return StatusCode(500, response);
+            }
         }
 
         [HttpDelete]
@@ -79,7 +120,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _registroMaterialService.DeleteAsync(id))
             {
-                response.Errors.Add("Registro Material not found");
+                response.Errors.Add("Registro de material no encontrado");
                 return NotFound(response);
             }
 

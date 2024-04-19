@@ -13,6 +13,8 @@ namespace Inventario.Api.Controllers
     public class DetallePedidosController : ControllerBase
     {
         private readonly IDetallePedidoService _detallePedidoService;
+        private readonly IMaterialService _materialService;
+        private readonly IPedidoService _pedidoService;
 
         public DetallePedidosController(IDetallePedidoService detallePedidoService)
         {
@@ -42,45 +44,69 @@ namespace Inventario.Api.Controllers
 
             try
             {
-                if (detallePedidoDto == null)
+                // Validación de tipo de datos y valores de los campos
+                try
                 {
-                    response.Errors.Add("La solicitud no puede estar vacía. Asegúrate de enviar los datos del detalle del pedido.");
+                    if (detallePedidoDto.Pedido_ID <= 0)
+                    {
+                        response.Errors.Add("El ID del pedido no es válido");
+                    }
+
+                    if (detallePedidoDto.Material_ID <= 0)
+                    {
+                        response.Errors.Add("El ID del material no es válido");
+                    }
+
+                    if (detallePedidoDto.Cantidad <= 0)
+                    {
+                        response.Errors.Add("La cantidad debe ser mayor que cero");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Errors.Add($"Error al validar los campos del detalle del pedido: {ex.Message}");
+                }
+
+                // Validación de IDs de tablas relacionales
+                try
+                {
+                    if (!await _pedidoService.PedidoExists(detallePedidoDto.Pedido_ID))
+                    {
+                        response.Errors.Add("El ID del pedido no existe en la tabla de pedidos");
+                    }
+
+                    if (!await _pedidoService.PedidoExists(detallePedidoDto.Material_ID))
+                    {
+                        response.Errors.Add("El ID del material no existe en la tabla de materiales");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Errors.Add($"Error, no existe el ID pedido ni ID material");
+                }
+
+                if (response.Errors.Any())
+                {
                     return BadRequest(response);
                 }
 
-                // Validar que el campo pedido_ID no sea negativo
-                if (detallePedidoDto.Pedido_ID < 0)
+                // Validación de la cantidad ingresada
+                if (detallePedidoDto.Cantidad == 0)
                 {
-                    response.Errors.Add("El ID del pedido no puede ser negativo. Por favor, proporciona un valor válido.");
+                    response.Errors.Add("La cantidad no puede ser cero");
                     return BadRequest(response);
                 }
 
-                // Validar que el campo material_ID no sea negativo y sea un número entero
-                if (detallePedidoDto.Material_ID <= 0)
-                {
-                    response.Errors.Add("El ID del material debe ser un número entero positivo. Por favor, proporciona un valor válido.");
-                    return BadRequest(response);
-                }
-
-                // Validar que la cantidad sea un número entero positivo
-                if (detallePedidoDto.Cantidad <= 0)
-                {
-                    response.Errors.Add("La cantidad debe ser un número entero positivo. Por favor, proporciona un valor válido.");
-                    return BadRequest(response);
-                }
-
-                // Guardar el detalle del pedido si todas las validaciones son exitosas
-                var savedDetallePedido = await _detallePedidoService.SaveAsync(detallePedidoDto);
-                response.Data = savedDetallePedido;
-                return Created($"/api/DetallePedidos/{savedDetallePedido.id}", response);
+                // Si todas las validaciones pasan, guardamos el detalle del pedido
+                response.Data = await _detallePedidoService.SaveAsync(detallePedidoDto);
+                return Created($"/api/[controller]/{response.Data.id}", response);
             }
             catch (Exception ex)
             {
-                response.Errors.Add("Se produjo un error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.");
+                response.Errors.Add($"Error al guardar el detalle del pedido: {ex.Message}");
                 return StatusCode(500, response);
             }
         }
-
 
         [HttpGet]
         [Route("{id:int}")]

@@ -23,23 +23,41 @@ namespace Inventario.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Response<List<ProveedorDto>>>> GetAll()
         {
-            var response = new Response<List<ProveedorDto>>
+            var response = new Response<List<ProveedorDto>>();
+
+            try
             {
-                Data = await _proveedorService.GetAllAsync()
-            };
-            return Ok(response);
+                response.Data = await _proveedorService.GetAllAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("No hay datos para mostrar");
+                return StatusCode(500, response);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<Response<ProveedorDto>>> Post([FromBody] ProveedorDto proveedorDto)
         {
-            var response = new Response<ProveedorDto>()
+            if (!ModelState.IsValid)
             {
-                Data = await _proveedorService.SaveAsync(proveedorDto)
-            };
-            return Created($"/api/[controller]/{response.Data.id}", response);
-        }
+                return BadRequest(ModelState);
+            }
 
+            var response = new Response<ProveedorDto>();
+
+            try
+            {
+                response.Data = await _proveedorService.SaveAsync(proveedorDto);
+                return Created($"/api/[controller]/{response.Data.id}", response);
+            }
+            catch (Exception ex)
+            {
+                response.Errors.Add("Verifica que hayas ingresado bien tus datos");
+                return StatusCode(500, response);
+            }
+        }
         [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<ProveedorDto>>> GetById(int id)
@@ -48,7 +66,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _proveedorService.ProveedorExists(id))
             {
-                response.Errors.Add("Proveedor not found");
+                response.Errors.Add("No existe el ID ingresado verifiquelo");
                 return NotFound(response);
             }
 
@@ -59,11 +77,16 @@ namespace Inventario.Api.Controllers
         [HttpPut]
         public async Task<ActionResult<Response<ProveedorDto>>> Update([FromBody] ProveedorDto proveedorDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var response = new Response<ProveedorDto>();
 
             if (!await _proveedorService.ProveedorExists(proveedorDto.id))
             {
-                response.Errors.Add("Proveedor not found");
+                response.Errors.Add("No existe el ID ingresado verifiquelo");
                 return NotFound(response);
             }
 
@@ -79,7 +102,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _proveedorService.DeleteAsync(id))
             {
-                response.Errors.Add("Proveedor not found");
+                response.Errors.Add("No existe el ID ingresado verifiquelo");
                 return NotFound(response);
             }
 

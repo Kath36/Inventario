@@ -7,6 +7,9 @@ namespace Inventario.Services.Interfaces
 {
     public interface IUsuarioService
     {
+            Task<UsuarioDto> AuthenticateAsync(string email, string contraseña);
+            // Los demás métodos de la interfaz siguen igual
+        
         Task<bool> UsuarioExists(int id);
         Task<UsuarioDto> RegistrarUsuarioAsync(UsuarioDto usuario);
         Task<UsuarioDto> ActualizarUsuarioAsync(UsuarioDto usuario);

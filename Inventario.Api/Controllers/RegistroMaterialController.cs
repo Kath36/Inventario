@@ -39,24 +39,37 @@ namespace Inventario.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Response<RegistroMaterialDto>>> Post([FromBody] RegistroMaterialDto registroMaterialDto)
+        public async Task<ActionResult<Response<RegistroMaterialDto>>> Post([FromBody] RegistroMaterialDtoSinId registroMaterialDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var response = new Response<RegistroMaterialDto>();
-
             try
             {
-                response.Data = await _registroMaterialService.SaveAsync(registroMaterialDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var response = new Response<RegistroMaterialDto>();
+
+                // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el registro de material
+
+                var registroMaterialDtoWithId = new RegistroMaterialDto
+                {
+                    MaterialId = registroMaterialDto.MaterialId,
+                    Cantidad = registroMaterialDto.Cantidad,
+                    FechaRegistro = DateTime.Now // Puedes asignar la fecha actual o la fecha proporcionada en el DTO
+                };
+
+                response.Data = await _registroMaterialService.SaveAsync(registroMaterialDtoWithId);
+
                 return Created($"/api/[controller]/{response.Data.id}", response);
             }
             catch (Exception ex)
             {
-                response.Errors.Add("Error al guardar el registro de material: " + ex.Message);
-                return StatusCode(500, response);
+                // Loguea la excepción para futura referencia
+                Console.WriteLine($"Error en el método Post: {ex}");
+
+                // Retorna un código de estado 500 junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
             }
         }
 

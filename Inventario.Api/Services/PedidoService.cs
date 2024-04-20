@@ -2,21 +2,25 @@
 using Inventario.Api.Dto;
 using Inventario.Api.Repositories.Interfecies;
 using Inventario.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Inventario.Api.Services
 {
     public class PedidoService : IPedidoService
     {
         private readonly IPedidoRepository _pedidoRepository;
-        
+
         public PedidoService(IPedidoRepository pedidoRepository)
         {
             _pedidoRepository = pedidoRepository;
         }
-        
-        public async Task<bool> PedidoExists(int ID)
+
+        public async Task<bool> PedidoExists(int id)
         {
-            var pedido = await _pedidoRepository.GetById(ID);
+            var pedido = await _pedidoRepository.GetById(id);
             return (pedido != null);
         }
 
@@ -32,12 +36,11 @@ namespace Inventario.Api.Services
                 UpdatedBy = "Kath",
                 UpdatedDate = DateTime.Now
             };
+
             pedido = await _pedidoRepository.SaveAsync(pedido);
             pedidoDto.id = pedido.id;
             return pedidoDto;
-         }
-
-       
+        }
 
         public async Task<PedidoDto> UpdateAsync(PedidoDto pedidoDto)
         {
@@ -49,23 +52,18 @@ namespace Inventario.Api.Services
             pedido.Cliente = pedidoDto.Cliente;
             pedido.Fecha_Pedido = pedidoDto.Fecha_Pedido;
             pedido.Estado = pedidoDto.Estado;
-            pedido.UpdatedBy = "";
+            pedido.UpdatedBy = "Kath";
             pedido.UpdatedDate = DateTime.Now;
 
             await _pedidoRepository.UpdateAsync(pedido);
             return pedidoDto;
         }
 
+
         public async Task<List<PedidoDto>> GetAllAsync()
         {
             var pedidos = await _pedidoRepository.GetAllAsync();
-            var pedidosDto = pedidos.Select(p => new PedidoDto
-            {
-                id = p.id,
-                Cliente = p.Cliente,
-                Fecha_Pedido = p.Fecha_Pedido,
-                Estado = p.Estado
-            }).ToList();
+            var pedidosDto = pedidos.Select(p => new PedidoDto(p)).ToList();
             return pedidosDto;
         }
 
@@ -79,14 +77,8 @@ namespace Inventario.Api.Services
             var pedido = await _pedidoRepository.GetById(id);
             if (pedido == null)
                 throw new Exception("Pedido not found");
-            
-            var pedidoDto = new PedidoDto
-            {
-                id = pedido.id,
-                Cliente = pedido.Cliente,
-                Fecha_Pedido = pedido.Fecha_Pedido,
-                Estado = pedido.Estado
-            };
+
+            var pedidoDto = new PedidoDto(pedido);
             return pedidoDto;
         }
     }

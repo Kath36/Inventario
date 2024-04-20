@@ -36,25 +36,60 @@ namespace Inventario.Api.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Response<OrdenCompraDto>>> Post([FromBody] OrdenCompraDto ordenCompraDto)
+      [HttpPost]
+        public async Task<ActionResult<Response<OrdenCompraDtoSinId>>> Post([FromBody] OrdenCompraDtoSinId ordenCompraDto)
         {
             try
             {
+                // Validar si el modelo recibido es válido
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
-                var response = new Response<OrdenCompraDto>()
+                var response = new Response<OrdenCompraDto>();
+
+                // Validar que los valores necesarios no sean nulos
+                if (ordenCompraDto.MaterialId <= 0)
                 {
-                    Data = await _ordenCompraService.SaveAsync(ordenCompraDto)
+                    ModelState.AddModelError(nameof(ordenCompraDto.MaterialId), "El MaterialId es obligatorio.");
+                    return BadRequest(ModelState);
+                }
+
+                if (ordenCompraDto.Cantidad <= 0)
+                {
+                    ModelState.AddModelError(nameof(ordenCompraDto.Cantidad), "La Cantidad debe ser mayor que cero.");
+                    return BadRequest(ModelState);
+                }
+
+                if (ordenCompraDto.ProveedorId <= 0)
+                {
+                    ModelState.AddModelError(nameof(ordenCompraDto.ProveedorId), "El ProveedorId es obligatorio.");
+                    return BadRequest(ModelState);
+                }
+
+                // Crear un nuevo DTO con los datos recibidos
+                var ordenCompraDtoWithId = new OrdenCompraDto
+                {
+                    MaterialId = ordenCompraDto.MaterialId,
+                    Cantidad = ordenCompraDto.Cantidad,
+                    ProveedorId = ordenCompraDto.ProveedorId,
+                    FechaOrden = DateTime.Now // Puedes establecer la fecha de la orden aquí o recibir la fecha como parte del DTO
                 };
+
+                // Guardar la orden de compra y obtener la respuesta
+                response.Data = await _ordenCompraService.SaveAsync(ordenCompraDtoWithId);
+
+                // Devolver una respuesta 201 Created con el DTO de la orden de compra creada
                 return Created($"/api/[controller]/{response.Data.id}", response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Verifica que el ID proveedor y material existan y/o que hayas colocado una cantidad"});
+                // Loguear la excepción para futura referencia
+                Console.WriteLine($"Error en el método Post: {ex}");
+
+                // Devolver una respuesta 500 Internal Server Error junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
             }
         }
 

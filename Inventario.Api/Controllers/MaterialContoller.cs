@@ -37,7 +37,7 @@ namespace Inventario.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Response<MaterialDto>>> Post([FromBody] MaterialDto materialDto)
+        public async Task<ActionResult<Response<MaterialDto>>> Post([FromBody] MaterialDtoSinId materialDto)
         {
             try
             {
@@ -46,17 +46,32 @@ namespace Inventario.Api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = new Response<MaterialDto>()
+                var response = new Response<MaterialDto>();
+
+                // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el material
+
+                var materialDtoWithId = new MaterialDto
                 {
-                    Data = await _materialService.SaveAsync(materialDto)
+                    Nombre = materialDto.Nombre,
+                    Descripcion = materialDto.Descripcion,
+                    Precio = materialDto.Precio,
+                    Unidad = materialDto.Unidad
                 };
+
+                response.Data = await _materialService.SaveAsync(materialDtoWithId);
+
                 return Created($"/api/[controller]/{response.Data.id}", response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Verifica que no estes colocando un dato malde acuerdo a lo solicitado"});
+                // Loguea la excepción para futura referencia
+                Console.WriteLine($"Error en el método Post: {ex}");
+
+                // Retorna un código de estado 500 junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
             }
         }
+
 
         [HttpGet]
         [Route("{id:int}")]

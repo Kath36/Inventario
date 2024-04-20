@@ -3,6 +3,10 @@ using Dapper.Contrib.Extensions;
 using Inventario.Core.Entities;
 using Inventario.Api.DataAccess.Interfaces;
 using Inventario.Api.Repositories.Interfecies;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Inventario.Api.Repositories
 {
@@ -30,7 +34,6 @@ namespace Inventario.Api.Repositories
         public async Task<List<Pedido>> GetAllAsync()
         {
             const string sql = "SELECT * FROM Pedido WHERE IsDeleted = 0";
-
             var pedidos = await _dbContext.Connection.QueryAsync<Pedido>(sql);
             return pedidos.ToList();
         }
@@ -49,7 +52,9 @@ namespace Inventario.Api.Repositories
         public async Task<Pedido> GetById(int id)
         {
             var pedido = await _dbContext.Connection.GetAsync<Pedido>(id);
-            return pedido?.IsDeleted == true ? null : pedido;
+            if (pedido == null)
+                return null;
+            return pedido.IsDeleted ? null : pedido;
         }
     }
 }

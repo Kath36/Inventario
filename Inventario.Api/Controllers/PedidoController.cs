@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Inventario.Core.Entities;
 using Inventario.Core.Http;
 using Inventario.Api.Dto;
+using Inventario.Api.Repositories.Interfecies;
 using Inventario.Services.Interfaces;
 
 namespace Inventario.Api.Controllers
@@ -11,32 +14,24 @@ namespace Inventario.Api.Controllers
     public class PedidosController : ControllerBase
     {
         private readonly IPedidoService _pedidoService;
-
+        
         public PedidosController(IPedidoService pedidoService)
         {
             _pedidoService = pedidoService;
         }
 
-   
         [HttpGet]
         public async Task<ActionResult<Response<List<PedidoDto>>>> GetAll()
         {
-            try
+            var response = new Response<List<PedidoDto>>
             {
-                var response = new Response<List<PedidoDto>>
-                {
-                    Data = await _pedidoService.GetAllAsync()
-                };
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "No hay datos"  });
-            }
+                Data = await _pedidoService.GetAllAsync()
+            };
+            return Ok(response);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Response<PedidoDto>>> Post([FromBody] PedidoDto pedidoDto)
+        public async Task<ActionResult<Response<PedidoDto>>> Post([FromBody] PedidoDtoSinId pedidoDto)
         {
             try
             {
@@ -45,19 +40,33 @@ namespace Inventario.Api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = new Response<PedidoDto>()
+                var response = new Response<PedidoDto>();
+
+                // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el pedido
+
+                var pedidoDtoWithId = new PedidoDto
                 {
-                    Data = await _pedidoService.SaveAsync(pedidoDto)
+                    Cliente = pedidoDto.Cliente,
+                    Fecha_Pedido = pedidoDto.Fecha_Orden,
+                    Estado = pedidoDto.Estado
                 };
+
+                response.Data = await _pedidoService.SaveAsync(pedidoDtoWithId);
+
                 return Created($"/api/[controller]/{response.Data.id}", response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Verifica que hayas llenado correctamente los campos " });
-            }
-            }
+                // Loguea la excepción para futura referencia
+                Console.WriteLine($"Error en el método Post: {ex}");
 
-            [HttpGet]
+                // Retorna un código de estado 500 junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
+            }
+        }
+
+
+        [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<PedidoDto>>> GetById(int id)
         {
@@ -65,7 +74,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.PedidoExists(id))
             {
-                return StatusCode(500, new { message = "El ID ingresado no existe" });
+                response.Errors.Add("Pedido not found");
                 return NotFound(response);
             }
 
@@ -80,7 +89,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.PedidoExists(pedidoDto.id))
             {
-                return StatusCode(500, new { message = "El ID ingresado no existe" });
+                response.Errors.Add("Pedido not found");
                 return NotFound(response);
             }
 
@@ -96,7 +105,7 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.DeleteAsync(id))
             {
-                return StatusCode(500, new { message = "El ID ingresado no existe" });
+                response.Errors.Add("Pedido not found");
                 return NotFound(response);
             }
 

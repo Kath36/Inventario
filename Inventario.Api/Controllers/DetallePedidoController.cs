@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Inventario.Core.Entities;
 using Inventario.Core.Http;
 using Inventario.Api.Dto;
+using Inventario.Api.Repositories.Interfecies;
 using Inventario.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Inventario.Api.Controllers
 {
     [ApiController]
@@ -24,141 +26,130 @@ namespace Inventario.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<Response<List<DetallePedidoDto>>>> GetAll()
         {
-            var response = new Response<List<DetallePedidoDto>>();
-            try
+            var response = new Response<List<DetallePedidoDto>>
             {
-                response.Data = await _detallePedidoService.GetAllAsync();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add("No hay datos");
-                return StatusCode(500, response);
-            }
+                Data = await _detallePedidoService.GetAllAsync()
+            };
+            return Ok(response);
         }
+   [HttpPost]
+public async Task<ActionResult<Response<DetallePedidoDto>>> Post([FromBody] DetallePedidoDtoSinId detallePedidoDtoSinId)
+{
+    var response = new Response<DetallePedidoDto>();
 
-        [HttpPost]
-        public async Task<ActionResult<Response<DetallePedidoDto>>> Post([FromBody] DetallePedidoDto detallePedidoDto)
+    try
+    {
+        // Validar que los campos no sean nulos o vacíos
+        if (detallePedidoDtoSinId == null)
         {
-            var response = new Response<DetallePedidoDto>();
-
-            try
-            {
-                // Validación de tipo de datos y valores de los campos
-                try
-                {
-                    if (detallePedidoDto.Pedido_ID <= 0)
-                    {
-                        response.Errors.Add("El ID del pedido no es válido");
-                    }
-
-                    if (detallePedidoDto.Material_ID <= 0)
-                    {
-                        response.Errors.Add("El ID del material no es válido");
-                    }
-
-                    if (detallePedidoDto.Cantidad <= 0)
-                    {
-                        response.Errors.Add("La cantidad debe ser mayor que cero");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    response.Errors.Add($"Error al validar los campos del detalle del pedido: {ex.Message}");
-                }
-
-                // Validación de IDs de tablas relacionales
-                try
-                {
-                    if (!await _pedidoService.PedidoExists(detallePedidoDto.Pedido_ID))
-                    {
-                        response.Errors.Add("El ID del pedido no existe en la tabla de pedidos");
-                    }
-
-                    if (!await _pedidoService.PedidoExists(detallePedidoDto.Material_ID))
-                    {
-                        response.Errors.Add("El ID del material no existe en la tabla de materiales");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    response.Errors.Add($"Error, no existe el ID pedido ni ID material");
-                }
-
-                if (response.Errors.Any())
-                {
-                    return BadRequest(response);
-                }
-
-                // Validación de la cantidad ingresada
-                if (detallePedidoDto.Cantidad == 0)
-                {
-                    response.Errors.Add("La cantidad no puede ser cero");
-                    return BadRequest(response);
-                }
-
-                // Si todas las validaciones pasan, guardamos el detalle del pedido
-                response.Data = await _detallePedidoService.SaveAsync(detallePedidoDto);
-                return Created($"/api/[controller]/{response.Data.id}", response);
-            }
-            catch (Exception ex)
-            {
-                response.Errors.Add($"Error al guardar el detalle del pedido: {ex.Message}");
-                return StatusCode(500, response);
-            }
+            response.Errors.Add("Los datos del detalle de pedido no pueden estar vacíos.");
+            return BadRequest(response);
         }
 
+        // Validar que los campos requeridos no estén vacíos
+        if (detallePedidoDtoSinId.Pedido_ID <= 0)
+        {
+            response.Errors.Add("El ID del pedido no es válido.");
+            return BadRequest(response);
+        }
+
+        if (detallePedidoDtoSinId.Material_ID <= 0)
+        {
+            response.Errors.Add("El ID del material no es válido.");
+            return BadRequest(response);
+        }
+
+        if (detallePedidoDtoSinId.Cantidad <= 0)
+        {
+            response.Errors.Add("La cantidad debe ser mayor que cero.");
+            return BadRequest(response);
+        }
+
+        // Verificar que el ID del pedido existe en la tabla de pedidos
+        try
+        {
+            var pedidoExists = await _pedidoService.PedidoExists(detallePedidoDtoSinId.Pedido_ID);
+            if (!pedidoExists)
+            {
+                response.Errors.Add("El ID del pedido no existe en la tabla de pedidos.");
+                return BadRequest(response);
+            }
+        }
+        catch (Exception ex)
+        {
+            response.Errors.Add($"Error al verificar la existencia del ID del pedido: {ex.Message}");
+            return StatusCode(500, response);
+        }
+
+        // Verificar que el ID del material existe en la tabla de materiales
+        try
+        {
+            var materialExists = await _materialService.MaterialExists(detallePedidoDtoSinId.Material_ID);
+            if (!materialExists)
+            {
+                response.Errors.Add("El ID del material no existe en la tabla de materiales.");
+                return BadRequest(response);
+            }
+        }
+        catch (Exception ex)
+        {
+            response.Errors.Add($"Error al verificar la existencia del ID del material: {ex.Message}");
+            return StatusCode(500, response);
+        }
+
+        // Convertir DetallePedidoDtoSinId a DetallePedidoDto
+        var detallePedidoDto = new DetallePedidoDto
+        {
+            Pedido_ID = detallePedidoDtoSinId.Pedido_ID,
+            Material_ID = detallePedidoDtoSinId.Material_ID,
+            Cantidad = detallePedidoDtoSinId.Cantidad
+        };
+
+        // Guardar el detalle del pedido utilizando el servicio
+        response.Data = await _detallePedidoService.SaveAsync(detallePedidoDto);
+
+        // Devolver una respuesta de éxito con el detalle del pedido guardado
+        return Created($"/api/DetallePedidos/{response.Data.Pedido_ID}", response);
+    }
+    catch (Exception ex)
+    {
+        // Manejar cualquier excepción y devolver una respuesta de error
+        response.Errors.Add($"Error al procesar la solicitud: {ex.Message}");
+        return StatusCode(500, response);
+    }
+}
+
+
+        
         [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<DetallePedidoDto>>> GetById(int id)
         {
             var response = new Response<DetallePedidoDto>();
-            try
-            {
-                var detallePedidoExists = await _detallePedidoService.DetallePedidoExists(id);
-                if (!detallePedidoExists)
-                {
-                    response.Errors.Add("El detalle de pedido no se encontró.");
-                    return NotFound(response);
-                }
 
-                response.Data = await _detallePedidoService.GetById(id);
-                return Ok(response);
-            }
-            catch (Exception ex)
+            if (!await _detallePedidoService.DetallePedidoExists(id))
             {
-                response.Errors.Add("Error, no existe el ID ingresado.");
-                return StatusCode(500, response);
+                response.Errors.Add("DetallePedido not found");
+                return NotFound(response);
             }
+
+            response.Data = await _detallePedidoService.GetById(id);
+            return Ok(response);
         }
 
         [HttpPut]
         public async Task<ActionResult<Response<DetallePedidoDto>>> Update([FromBody] DetallePedidoDto detallePedidoDto)
         {
             var response = new Response<DetallePedidoDto>();
-            try
-            {
-                if (detallePedidoDto == null)
-                {
-                    response.Errors.Add("Los datos del detalle de pedido no pueden estar vacíos.");
-                    return BadRequest(response);
-                }
 
-                var detallePedidoExists = await _detallePedidoService.DetallePedidoExists(detallePedidoDto.id);
-                if (!detallePedidoExists)
-                {
-                    response.Errors.Add("El ID especidicado no se encontró.");
-                    return NotFound(response);
-                }
-
-                response.Data = await _detallePedidoService.UpdateAsync(detallePedidoDto);
-                return Ok(response);
-            }
-            catch (Exception ex)
+            if (!await _detallePedidoService.DetallePedidoExists(detallePedidoDto.id))
             {
-                response.Errors.Add("El ID especidicado no se encontró.");
-                return StatusCode(500, response);
+                response.Errors.Add("DetallePedido not found");
+                return NotFound(response);
             }
+
+            response.Data = await _detallePedidoService.UpdateAsync(detallePedidoDto);
+            return Ok(response);
         }
 
         [HttpDelete]
@@ -166,22 +157,14 @@ namespace Inventario.Api.Controllers
         public async Task<ActionResult<Response<bool>>> Delete(int id)
         {
             var response = new Response<bool>();
-            try
-            {
-                var deleted = await _detallePedidoService.DeleteAsync(id);
-                if (!deleted)
-                {
-                    response.Errors.Add("El ID especidicado no se encontró.");
-                    return NotFound(response);
-                }
 
-                return Ok(response);
-            }
-            catch (Exception ex)
+            if (!await _detallePedidoService.DeleteAsync(id))
             {
-                response.Errors.Add("El ID especidicado no se encontró.");
-                return StatusCode(500, response);
+                response.Errors.Add("DetallePedido not found");
+                return NotFound(response);
             }
+
+            return Ok(response);
         }
     }
 }

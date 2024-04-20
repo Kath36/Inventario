@@ -17,39 +17,74 @@ namespace Inventario.Api.Repositories
 
         public async Task<DetallePedido> SaveAsync(DetallePedido detallePedido)
         {
-            detallePedido.id = await _dbContext.Connection.InsertAsync(detallePedido);
-            return detallePedido;
+            try
+            {
+                detallePedido.id = await _dbContext.Connection.InsertAsync(detallePedido);
+                return detallePedido;
+            }
+            catch (Exception ex)
+            {
+                // Manejar la excepción o lanzarla nuevamente si se quiere propagar hacia arriba.
+                throw new Exception("Repository", ex);
+            }
         }
 
         public async Task<DetallePedido> UpdateAsync(DetallePedido detallePedido)
         {
-            await _dbContext.Connection.UpdateAsync(detallePedido);
-            return detallePedido;
+            try
+            {
+                await _dbContext.Connection.UpdateAsync(detallePedido);
+                return detallePedido;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Repository", ex);
+            }
         }
 
         public async Task<List<DetallePedido>> GetAllAsync()
         {
-            const string sql = "SELECT * FROM DetallePedido WHERE IsDeleted = 0";
-
-            var detallesPedidos = await _dbContext.Connection.QueryAsync<DetallePedido>(sql);
-            return detallesPedidos.ToList();
+            try
+            {
+                const string sql = "SELECT * FROM DetallePedido WHERE IsDeleted = 0";
+                var detallesPedidos = await _dbContext.Connection.QueryAsync<DetallePedido>(sql);
+                return detallesPedidos.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Repository", ex);
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var detallePedido = await GetById(id);
-            if (detallePedido == null)
-                return false;
+            try
+            {
+                var detallePedido = await GetById(id);
+                if (detallePedido == null)
+                    return false;
 
-            detallePedido.IsDeleted = true;
+                detallePedido.IsDeleted = true;
 
-            return await _dbContext.Connection.UpdateAsync(detallePedido);
+                return await _dbContext.Connection.UpdateAsync(detallePedido);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Repository", ex);
+            }
         }
 
         public async Task<DetallePedido> GetById(int id)
         {
-            var detallePedido = await _dbContext.Connection.GetAsync<DetallePedido>(id);
-            return detallePedido?.IsDeleted == true ? null : detallePedido;
+            try
+            {
+                var detallePedido = await _dbContext.Connection.GetAsync<DetallePedido>(id);
+                return detallePedido?.IsDeleted == true ? null : detallePedido;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Repository", ex);
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Inventario.Core.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Inventario.Api.Repositories.Interfecies
 {
@@ -14,9 +16,9 @@ namespace Inventario.Api.Repositories.Interfecies
         Task<List<Pedido>> GetAllAsync();
         
         // Método para borrar un pedido por su ID
-        Task<bool> DeleteAsync(int ID);
+        Task<bool> DeleteAsync(int id);
         
         // Método para obtener un pedido por su ID
-        Task<Pedido> GetById(int ID);
+        Task<Pedido> GetById(int id);
     }
 }

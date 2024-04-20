@@ -39,13 +39,37 @@ namespace Inventario.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Response<UsuarioDto>>> Post([FromBody] UsuarioDto usuarioDto)
+        public async Task<ActionResult<Response<UsuarioDto>>> Post([FromBody] UsuarioDtoSinId usuarioDto)
         {
-            var response = new Response<UsuarioDto>
+            try
             {
-                Data = await _usuarioService.RegistrarUsuarioAsync(usuarioDto)
-            };
-            return Created($"/api/[controller]/{response.Data.id}", response);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var response = new Response<UsuarioDto>();
+
+                // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el usuario
+
+                var usuarioDtoWithId = new UsuarioDto
+                {
+                    Email = usuarioDto.Email,
+                    Contraseña = usuarioDto.Contraseña
+                };
+
+                response.Data = await _usuarioService.RegistrarUsuarioAsync(usuarioDtoWithId);
+
+                return Created($"/api/[controller]/{response.Data.id}", response);
+            }
+            catch (Exception ex)
+            {
+                // Loguea la excepción para futura referencia
+                Console.WriteLine($"Error en el método Post: {ex}");
+
+                // Retorna un código de estado 500 junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
+            }
         }
 
         [HttpGet]

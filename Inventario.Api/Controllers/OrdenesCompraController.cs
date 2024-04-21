@@ -19,6 +19,7 @@ namespace Inventario.Api.Controllers
             _ordenCompraService = ordenCompraService;
         }
 
+//e////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpGet]
         public async Task<ActionResult<Response<List<OrdenCompraDto>>>> GetAll()
         {
@@ -36,20 +37,21 @@ namespace Inventario.Api.Controllers
             }
         }
 
-      [HttpPost]
-        public async Task<ActionResult<Response<OrdenCompraDtoSinId>>> Post([FromBody] OrdenCompraDtoSinId ordenCompraDto)
+//e///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+        [HttpPost]
+        public async Task<ActionResult<Response<OrdenCompraDtoSinId>>> Post(
+            [FromBody] OrdenCompraDtoSinId ordenCompraDto)
         {
             try
             {
                 // Validar si el modelo recibido es válido
                 if (!ModelState.IsValid)
                 {
+                    // Si hay errores de validación en el modelo, devolver BadRequest con los errores
                     return BadRequest(ModelState);
                 }
 
-                var response = new Response<OrdenCompraDto>();
-
-                // Validar que los valores necesarios no sean nulos
+                // Validar que los valores necesarios no sean nulos o inválidos
                 if (ordenCompraDto.MaterialId <= 0)
                 {
                     ModelState.AddModelError(nameof(ordenCompraDto.MaterialId), "El MaterialId es obligatorio.");
@@ -74,14 +76,15 @@ namespace Inventario.Api.Controllers
                     MaterialId = ordenCompraDto.MaterialId,
                     Cantidad = ordenCompraDto.Cantidad,
                     ProveedorId = ordenCompraDto.ProveedorId,
-                    FechaOrden = DateTime.Now // Puedes establecer la fecha de la orden aquí o recibir la fecha como parte del DTO
+                    FechaOrden =
+                        DateTime.Now // Puedes establecer la fecha de la orden aquí o recibir la fecha como parte del DTO
                 };
 
-                // Guardar la orden de compra y obtener la respuesta
-                response.Data = await _ordenCompraService.SaveAsync(ordenCompraDtoWithId);
+                // Guardar la orden de compra
+                await _ordenCompraService.SaveAsync(ordenCompraDtoWithId);
 
-                // Devolver una respuesta 201 Created con el DTO de la orden de compra creada
-                return Created($"/api/[controller]/{response.Data.id}", response);
+                // Devolver un mensaje de éxito
+                return Ok(new { message = "La orden de compra se agregó correctamente." });
             }
             catch (Exception ex)
             {
@@ -89,9 +92,10 @@ namespace Inventario.Api.Controllers
                 Console.WriteLine($"Error en el método Post: {ex}");
 
                 // Devolver una respuesta 500 Internal Server Error junto con un mensaje de error genérico
-                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
+                return StatusCode(500, new { message = "Verifica que el ID material y/o ID proveedor existan." });
             }
         }
+//e/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet]
         [Route("{id:int}")]
@@ -103,7 +107,7 @@ namespace Inventario.Api.Controllers
 
                 if (!await _ordenCompraService.OrdenCompraExists(id))
                 {
-                    response.Errors.Add("Orden Compra no existe");
+                    return StatusCode(500, new { message = "El ID ingresado no existe" });
                     return NotFound(response);
                 }
 
@@ -116,32 +120,58 @@ namespace Inventario.Api.Controllers
             }
         }
 
+//e///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+
+
         [HttpPut]
         public async Task<ActionResult<Response<OrdenCompraDto>>> Update([FromBody] OrdenCompraDto ordenCompraDto)
         {
+            var response = new Response<OrdenCompraDto>();
+
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var response = new Response<OrdenCompraDto>();
-
+                // Verificar si la orden de compra existe
                 if (!await _ordenCompraService.OrdenCompraExists(ordenCompraDto.id))
                 {
-                    return StatusCode(500, new { message = "El ID ingresado no existe" });
+                    response.Errors.Add("Orden de compra no encontrada");
                     return NotFound(response);
                 }
 
-                response.Data = await _ordenCompraService.UpdateAsync(ordenCompraDto);
+                // Validar que la cantidad no sea nula
+                if (ordenCompraDto.Cantidad == 0)
+                {
+                    ModelState.AddModelError(nameof(ordenCompraDto.Cantidad), "La Cantidad es obligatoria.");
+                    return BadRequest(ModelState);
+                }
+
+                // Crear un nuevo objeto OrdenCompraDto sin incluir la propiedad FechaOrden
+                var ordenCompraDtoToUpdate = new OrdenCompraDto
+                {
+                    id = ordenCompraDto.id,
+                    MaterialId = ordenCompraDto.MaterialId,
+                    Cantidad = ordenCompraDto.Cantidad, // Accede al valor de cantidad usando .Value
+                    ProveedorId = ordenCompraDto.ProveedorId
+                };
+
+                // Actualizar la orden de compra en la base de datos
+                response.Data = await _ordenCompraService.UpdateAsync(ordenCompraDtoToUpdate);
+
+                // Agregar un mensaje de éxito al objeto de respuesta
+                response.Message = "La orden de compra se actualizó correctamente";
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "El ID ingresado no existe" });
+                // Loguear la excepción para futura referencia
+                Console.WriteLine($"Error en el método Update: {ex}");
+
+                // Devolver una respuesta 500 Internal Server Error junto con un mensaje de error genérico
+                return StatusCode(500, new { message = "Verifica que el ID material y/o ID proveedor existan." });
             }
         }
+
+//e///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
 
         [HttpDelete]
         [Route("{id:int}")]
@@ -153,16 +183,22 @@ namespace Inventario.Api.Controllers
 
                 if (!await _ordenCompraService.DeleteAsync(id))
                 {
-                    return StatusCode(500, new { message = "El ID ingresado no existe" });
-                    return NotFound(response);
+                    return NotFound(new { message = "El ID ingresado no existe" });
                 }
+
+                // Agregar un mensaje de éxito al objeto de respuesta
+                response.Message = "El elemento fue eliminado correctamente";
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "El ID ingresado no existe" });
+                // Loguear la excepción para futura referencia
+                Console.WriteLine($"Error en el método Delete: {ex}");
+
+                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
             }
         }
     }
 }
+//e///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////        

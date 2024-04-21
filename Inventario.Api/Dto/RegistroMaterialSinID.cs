@@ -4,6 +4,5 @@
     {
         public int MaterialId { get; set; }
         public int Cantidad { get; set; }
-        public DateTime FechaRegistro { get; set; }
     }
 }

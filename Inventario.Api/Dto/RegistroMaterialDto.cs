@@ -1,4 +1,5 @@
-﻿using Inventario.Core.Entities;
+﻿using System.Text.Json.Serialization;
+using Inventario.Core.Entities;
 
 namespace Inventario.Api.Dto
 {
@@ -6,7 +7,9 @@ namespace Inventario.Api.Dto
     {
         public int MaterialId { get; set; }
         public int Cantidad { get; set; }
-        public DateTime FechaRegistro { get; set; }
+
+        [JsonIgnore]
+        public DateTime Fecha_Registro { get; set; }
 
         public RegistroMaterialDto()
         {
@@ -18,7 +21,7 @@ namespace Inventario.Api.Dto
             id = registroMaterial.id;
             MaterialId = registroMaterial.Material_ID;
             Cantidad = registroMaterial.Cantidad;
-            FechaRegistro = registroMaterial.Fecha_Registro;
+            Fecha_Registro = registroMaterial.UpdatedDate;
         }
     }
 }

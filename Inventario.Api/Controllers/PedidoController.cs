@@ -14,7 +14,7 @@ namespace Inventario.Api.Controllers
     public class PedidosController : ControllerBase
     {
         private readonly IPedidoService _pedidoService;
-        
+
         public PedidosController(IPedidoService pedidoService)
         {
             _pedidoService = pedidoService;
@@ -35,6 +35,13 @@ namespace Inventario.Api.Controllers
         {
             try
             {
+                // Verificar si los campos cliente y estado son nulos o vacíos
+                if (string.IsNullOrEmpty(pedidoDto.Cliente) || string.IsNullOrEmpty(pedidoDto.Estado))
+                {
+                    return BadRequest(
+                        new { message = "Los campos de cliente y estado son obligatorios" });
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
@@ -47,11 +54,14 @@ namespace Inventario.Api.Controllers
                 var pedidoDtoWithId = new PedidoDto
                 {
                     Cliente = pedidoDto.Cliente,
-                    Fecha_Pedido = pedidoDto.Fecha_Orden,
+                    Fecha_Pedido = DateTime.Now,
                     Estado = pedidoDto.Estado
                 };
 
                 response.Data = await _pedidoService.SaveAsync(pedidoDtoWithId);
+
+                // Devolver un mensaje indicando que el pedido se agregó correctamente
+                response.Message = "Pedido agregado correctamente";
 
                 return Created($"/api/[controller]/{response.Data.id}", response);
             }
@@ -61,10 +71,10 @@ namespace Inventario.Api.Controllers
                 Console.WriteLine($"Error en el método Post: {ex}");
 
                 // Retorna un código de estado 500 junto con un mensaje de error genérico
-                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
+                return StatusCode(500,
+                    new { message = "Tienes que colocar el cliente correcto y/o el Estado en que esta ese pedido." });
             }
         }
-
 
         [HttpGet]
         [Route("{id:int}")]
@@ -72,14 +82,16 @@ namespace Inventario.Api.Controllers
         {
             var response = new Response<PedidoDto>();
 
+            // Verificar si el pedido existe antes de intentar obtenerlo
             if (!await _pedidoService.PedidoExists(id))
             {
-                response.Errors.Add("Pedido not found");
+                response.Errors.Add("No existe");
                 return NotFound(response);
             }
 
+            // Si el pedido existe, obtenerlo y devolverlo en la respuesta
             response.Data = await _pedidoService.GetById(id);
-            return Ok(response);
+            return response;
         }
 
         [HttpPut]
@@ -89,13 +101,26 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.PedidoExists(pedidoDto.id))
             {
-                response.Errors.Add("Pedido not found");
+                response.Errors.Add("No existe");
                 return NotFound(response);
             }
 
-            response.Data = await _pedidoService.UpdateAsync(pedidoDto);
+            // Crear un nuevo PedidoDto sin incluir la propiedad Fecha_Pedido
+            var pedidoDtoToUpdate = new PedidoDto
+            {
+                id = pedidoDto.id,
+                Cliente = pedidoDto.Cliente,
+                Estado = pedidoDto.Estado
+            };
+
+            response.Data = await _pedidoService.UpdateAsync(pedidoDtoToUpdate);
+
+            // Agregar un mensaje de éxito al objeto de respuesta
+            response.Message = "El pedido se actualizó correctamente";
+
             return Ok(response);
         }
+
 
         [HttpDelete]
         [Route("{id:int}")]
@@ -105,9 +130,12 @@ namespace Inventario.Api.Controllers
 
             if (!await _pedidoService.DeleteAsync(id))
             {
-                response.Errors.Add("Pedido not found");
+                response.Errors.Add("El ID ingresado no existe");
                 return NotFound(response);
             }
+
+            // Agregar un mensaje de éxito al objeto de respuesta
+            response.Message = "El pedido se eliminó correctamente";
 
             return Ok(response);
         }

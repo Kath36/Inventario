@@ -46,7 +46,7 @@ public class ProductCategoryServices : IProductCategoryService
 
         category.Name = categoryDto.Name;
         category.Description = categoryDto.Description;
-        category.UpdatedBy = "";
+        category.UpdatedBy = "Kath";
         category.UpdatedDate = DateTime.Now;
         await _productCategoryRepository.UpdateAsync(category);
         return categoryDto;

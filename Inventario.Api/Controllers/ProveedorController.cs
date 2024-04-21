@@ -19,7 +19,7 @@ namespace Inventario.Api.Controllers
         {
             _proveedorService = proveedorService;
         }
-
+//U////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpGet]
         public async Task<ActionResult<Response<List<ProveedorDto>>>> GetAll()
         {
@@ -36,44 +36,81 @@ namespace Inventario.Api.Controllers
                 return StatusCode(500, response);
             }
         }
-
-       
-        [HttpPost]
-        public async Task<ActionResult<Response<ProveedorDto>>> Post([FromBody] ProveedorDtoSinId proveedorDto)
+//UU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7        
+     [HttpPost]
+public async Task<ActionResult<Response<ProveedorDto>>> Post([FromBody] ProveedorDtoSinId proveedorDto)
+{
+    try
+    {
+        // Verificar si el modelo recibido es válido
+        if (!ModelState.IsValid)
         {
-            try
+            // Crear una lista para almacenar los errores de validación
+            var validationErrors = new List<string>();
+
+            // Agregar todos los errores de validación del modelo al listado
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var response = new Response<ProveedorDto>();
-
-                // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el proveedor
-
-                var proveedorDtoWithId = new ProveedorDto
-                {
-                    Nombre = proveedorDto.Nombre,
-                    Direccion = proveedorDto.Direccion,
-                    Telefono = proveedorDto.Telefono
-                };
-
-                response.Data = await _proveedorService.SaveAsync(proveedorDtoWithId);
-
-                return Created($"/api/[controller]/{response.Data.id}", response);
+                validationErrors.Add(error.ErrorMessage);
             }
-            catch (Exception ex)
-            {
-                // Loguea la excepción para futura referencia
-                Console.WriteLine($"Error en el método Post: {ex}");
 
-                // Retorna un código de estado 500 junto con un mensaje de error genérico
-                return StatusCode(500, new { message = "Ocurrió un error al procesar la solicitud." });
-            }
+            // Devolver una respuesta 400 Bad Request con la lista de errores de validación
+            return BadRequest(new { errors = validationErrors });
         }
 
+        var response = new Response<ProveedorDto>();
 
+        // Verificar si los campos requeridos no son nulos
+        if (string.IsNullOrEmpty(proveedorDto.Nombre))
+        {
+            response.Errors.Add("El nombre del proveedor es obligatorio.");
+        }
+
+        if (string.IsNullOrEmpty(proveedorDto.Direccion))
+        {
+            response.Errors.Add("La dirección del proveedor es obligatoria.");
+        }
+
+        if (string.IsNullOrEmpty(proveedorDto.Telefono))
+        {
+            response.Errors.Add("El teléfono del proveedor es obligatorio.");
+        }
+
+        // Verificar si se han agregado errores de validación
+        if (response.Errors.Any())
+        {
+            // Devolver una respuesta 400 Bad Request con la lista de errores
+            return BadRequest(new { errors = response.Errors });
+        }
+
+        // Aquí puedes realizar cualquier validación adicional necesaria antes de guardar el proveedor
+
+        var proveedorDtoWithId = new ProveedorDto
+        {
+            Nombre = proveedorDto.Nombre,
+            Direccion = proveedorDto.Direccion,
+            Telefono = proveedorDto.Telefono
+        };
+
+        response.Data = await _proveedorService.SaveAsync(proveedorDtoWithId);
+
+        // Agregar un mensaje de éxito a la respuesta
+        response.Message = "El proveedor se ha agregado correctamente.";
+
+        return Created($"/api/[controller]/{response.Data.id}", response);
+    }
+    catch (Exception ex)
+    {
+        // Crear una lista para almacenar el mensaje de error de la excepción
+        var errorList = new List<string>();
+        errorList.Add($"Error en el método Post: {ex.Message}");
+
+        // Devolver una respuesta 500 Internal Server Error con el mensaje de error
+        return StatusCode(500, new { errors = errorList });
+    }
+}
+
+//U////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpGet]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<ProveedorDto>>> GetById(int id)
@@ -89,27 +126,39 @@ namespace Inventario.Api.Controllers
             response.Data = await _proveedorService.GetByIdAsync(id);
             return Ok(response);
         }
-
+//U////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpPut]
         public async Task<ActionResult<Response<ProveedorDto>>> Update([FromBody] ProveedorDto proveedorDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var response = new Response<ProveedorDto>();
+
+                if (!await _proveedorService.ProveedorExists(proveedorDto.id))
+                {
+                    response.Errors.Add("No existe el ID ingresado. Verifíquelo.");
+                    return NotFound(response);
+                }
+
+                response.Data = await _proveedorService.UpdateAsync(proveedorDto);
+
+                // Agregar un mensaje de éxito a la respuesta
+                response.Message = "El proveedor se ha actualizado correctamente.";
+
+                return Ok(response);
             }
-
-            var response = new Response<ProveedorDto>();
-
-            if (!await _proveedorService.ProveedorExists(proveedorDto.id))
+            catch (Exception ex)
             {
-                response.Errors.Add("No existe el ID ingresado verifiquelo");
-                return NotFound(response);
+                return StatusCode(500, new { message = "No se pudo actualizar el proveedor. Error interno del servidor: " + ex.Message });
             }
-
-            response.Data = await _proveedorService.UpdateAsync(proveedorDto);
-            return Ok(response);
         }
 
+//U////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<ActionResult<Response<bool>>> Delete(int id)
@@ -118,10 +167,12 @@ namespace Inventario.Api.Controllers
 
             if (!await _proveedorService.DeleteAsync(id))
             {
-                response.Errors.Add("No existe el ID ingresado verifiquelo");
+                response.Errors.Add("El ID ingresado no existe");
                 return NotFound(response);
             }
 
+            // Agregar un mensaje de éxito al objeto de respuesta
+            response.Message = "El Proveedor se eliminó correctamente";
             return Ok(response);
         }
     }

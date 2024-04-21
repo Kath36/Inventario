@@ -53,7 +53,7 @@ namespace Inventario.Api.Services
             ordenCompra.Cantidad = ordenCompraDto.Cantidad;
             ordenCompra.Proveedor_ID = ordenCompraDto.ProveedorId;
             ordenCompra.Fecha_Orden = ordenCompraDto.FechaOrden;
-            ordenCompra.UpdatedBy = "";
+            ordenCompra.UpdatedBy = "Kath";
             ordenCompra.UpdatedDate = DateTime.Now;
 
             await _ordenCompraRepository.UpdateAsync(ordenCompra);

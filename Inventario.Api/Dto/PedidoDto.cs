@@ -1,10 +1,12 @@
-﻿using Inventario.Core.Entities;
+﻿using System.Text.Json.Serialization;
+using Inventario.Core.Entities;
 
 namespace Inventario.Api.Dto
 {
     public class PedidoDto : DtoBase
     {
         public string Cliente { get; set; }
+        [JsonIgnore]
         public DateTime Fecha_Pedido { get; set; }
         public string Estado { get; set; }
 
@@ -17,7 +19,7 @@ namespace Inventario.Api.Dto
         {
             id = pedido.id;
             Cliente = pedido.Cliente;
-            Fecha_Pedido = pedido.Fecha_Pedido;
+            Fecha_Pedido = pedido.UpdatedDate;
             Estado = pedido.Estado;
         }
     }

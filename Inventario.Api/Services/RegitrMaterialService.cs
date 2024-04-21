@@ -26,7 +26,7 @@ namespace Inventario.Api.Services
             {
                 Material_ID = registroMaterialDto.MaterialId,
                 Cantidad = registroMaterialDto.Cantidad,
-                Fecha_Registro = registroMaterialDto.FechaRegistro,
+                Fecha_Registro = registroMaterialDto.Fecha_Registro,
                 CreatedBy = "Kath",
                 CreatedDate = DateTime.Now,
                 UpdatedBy = "Kath",
@@ -46,8 +46,8 @@ namespace Inventario.Api.Services
 
             registroMaterial.Material_ID = registroMaterialDto.MaterialId;
             registroMaterial.Cantidad = registroMaterialDto.Cantidad;
-            registroMaterial.Fecha_Registro = registroMaterialDto.FechaRegistro;
-            registroMaterial.UpdatedBy = "";
+            registroMaterial.Fecha_Registro = registroMaterialDto.Fecha_Registro;
+            registroMaterial.UpdatedBy = "Kath";
             registroMaterial.UpdatedDate = DateTime.Now;
 
             await _registroMaterialRepository.UpdateAsync(registroMaterial);

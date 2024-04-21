@@ -51,7 +51,7 @@ namespace Inventario.Api.Services
             proveedor.Nombre = proveedorDto.Nombre;
             proveedor.Direccion = proveedorDto.Direccion;
             proveedor.Telefono = proveedorDto.Telefono;
-            proveedor.UpdatedBy = "";
+            proveedor.UpdatedBy = "Kath";
             proveedor.UpdatedDate = DateTime.Now;
 
             await _proveedorRepository.UpdateAsync(proveedor);

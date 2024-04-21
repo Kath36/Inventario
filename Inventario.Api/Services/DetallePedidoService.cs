@@ -106,7 +106,7 @@ namespace Inventario.Api.Services
                 detallePedido.Pedido_ID = detallePedidoDto.Pedido_ID;
                 detallePedido.Material_ID = detallePedidoDto.Material_ID;
                 detallePedido.Cantidad = detallePedidoDto.Cantidad;
-                detallePedido.UpdatedBy = "";
+                detallePedido.UpdatedBy = "Kath";
                 detallePedido.UpdatedDate = DateTime.Now;
 
                 await _detallePedidoRepository.UpdateAsync(detallePedido);
